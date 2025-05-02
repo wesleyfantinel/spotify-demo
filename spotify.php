@@ -5,7 +5,7 @@
  * Description: Creates a custom block to be used with Remote Data Blocks in order to retrieve country information.
  * Author: WPVIP
  * Author URI: https://remotedatablocks.com/
- * Text Domain: remote-data-blocks
+ * Text Domain: spotify-top-tracks
  * Version: 1.0.0
  * Requires Plugins: remote-data-blocks
  */
@@ -21,7 +21,7 @@ function get_spotify_access_token( string $client_id, string $client_secret, boo
 	$cache_key = 'spotify_auth_token';
 	
 	if ( ! $no_cache ) {
-		$cached_token = wp_cache_get( $cache_key, 'oauth-tokens' );
+		$cached_token = get_transient( $cache_key );
 		if ( false !== $cached_token ) {
 			return $cached_token;
 		}
@@ -62,11 +62,10 @@ function get_spotify_access_token( string $client_id, string $client_secret, boo
 	$token = $response_data['access_token'];
 	
 	// Cache the token for 30 minutes
-	wp_cache_set(
+	set_transient(
 		$cache_key,
 		$token,
-		'oauth-tokens',
-		1800 // 30 minutes
+		3000 // 50 minutes
 	);
 
 	return $token;
@@ -77,20 +76,20 @@ function register_spotify_artists_tracks_block(): void {
 	$client_secret = '01f78fc45bc0486da9b3c7a506948aff';
 	$artist_id = '06HL4z0CvFAxyc27GXpf02';
 
-	$token = get_spotify_access_token( $client_id, $client_secret );
-
-	if ( is_wp_error( $token ) ) {
-		return;
-	}
-
 	$spotify_data_source = HttpDataSource::from_array( [
+		'request_headers' => function () use ( $client_id, $client_secret ): array {
+			$token = get_spotify_access_token( $client_id, $client_secret );
+			if ( is_wp_error( $token ) ) {
+				return [];
+			}
+			return [
+				'Authorization' => 'Bearer ' . $token,
+			];
+		},
 		'service_config' => [
 			'__version' => 1,
 			'display_name' => 'Spotify',
 			'endpoint' => 'https://api.spotify.com/v1',
-			'request_headers' => [
-				'Authorization' => 'Bearer ' . $token,
-			],
 		],
 	] );
 	
