@@ -18,7 +18,9 @@ use WP_Error;
 
 function get_spotify_access_token( string $client_id, string $client_secret, bool $no_cache = false ): WP_Error|string {
 	// Check for cached token first
-	$cache_key = 'spotify_auth_token';
+	$hashed_spotify_client_id = md5( $client_id );
+	$grant_type = 'client_credentials';
+	$cache_key = 'spotify_auth_token_' . $hashed_spotify_client_id . '_' . $grant_type;
 	
 	if ( ! $no_cache ) {
 		$cached_token = get_transient( $cache_key );
@@ -86,11 +88,8 @@ function register_spotify_artists_tracks_block(): void {
 				'Authorization' => 'Bearer ' . $token,
 			];
 		},
-		'service_config' => [
-			'__version' => 1,
-			'display_name' => 'Spotify',
-			'endpoint' => 'https://api.spotify.com/v1',
-		],
+		'endpoint' => 'https://api.spotify.com/v1',
+		'display_name' => 'Spotify',
 	] );
 	
 	// Define query to get artist's albums
