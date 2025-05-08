@@ -67,9 +67,9 @@
             <dc:creator><![CDATA[admin]]></dc:creator>
             <guid isPermaLink="false">https://playground.wordpress.net/scope:funny-trendy-garden/?page_id=22</guid>
             <description></description>
-            <content:encoded><![CDATA[<!-- wp:cover {"url":"https://playground.wordpress.net/scope:ambitious-trendy-valley/wp-content/uploads/2025/05/cover.jpg","id":30,"dimRatio":50,"customOverlayColor":"#716316","isUserOverlayColor":false,"sizeSlug":"large","layout":{"type":"constrained"}} -->
-<div class="wp-block-cover"><img class="wp-block-cover__image-background wp-image-30 size-large" alt="" src="https://playground.wordpress.net/scope:ambitious-trendy-valley/wp-content/uploads/2025/05/cover.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#716316"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
-<p class="has-text-align-center has-large-font-size">FOXCULT</p>
+            <content:encoded><![CDATA[<!-- wp:cover {"url":"/wp-content/uploads/2025/05/cover.jpg","id":30,"dimRatio":50,"customOverlayColor":"#716316","isUserOverlayColor":false,"sizeSlug":"large","layout":{"type":"constrained"}} -->
+<div class="wp-block-cover"><img class="wp-block-cover__image-background wp-image-30 size-large" alt="" src="/wp-content/uploads/2025/05/cover.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#716316"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 
