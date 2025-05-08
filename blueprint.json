@@ -76,37 +76,6 @@
       "pluginPath": "spotify.php"
     },
     {
-      "step": "writeFile",
-      "path": "/wordpress/wp-content/amethyst-drift.jpg",
-      "data": {
-        "resource": "url",
-        "url": "https://raw.githubusercontent.com/Automattic/spotify-demo/trunk/amethyst-drift.jpg"
-      }
-    },
-    {
-      "step": "writeFile",
-      "path": "/wordpress/wp-content/foxcult.webp",
-      "data": {
-        "resource": "url",
-        "url": "https://raw.githubusercontent.com/Automattic/spotify-demo/trunk/foxcult.webp"
-      }
-    },
-    {
-      "step": "wp-cli",
-      "command": "wp media import wordpress/wp-content/foxcult.webp --title='foxcult'"
-    },
-    {
-      "step": "wp-cli",
-      "command": "wp media import wordpress/wp-content/amethyst-drift.jpg --title='Amethyst Drift Cover'"
-    },
-    {
-      "step": "importWxr",
-      "file": {
-        "resource": "url",
-        "url": "https://raw.githubusercontent.com/Automattic/spotify-demo/trunk/content.xml"
-      }
-    },
-    {
       "step": "setSiteOptions",
       "options": {
         "show_on_front": "page",

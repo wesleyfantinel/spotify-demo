@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 /**
  * Plugin Name: Spotify Top Tracks
@@ -16,19 +16,20 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use WP_Error;
 
-function get_spotify_access_token( string $client_id, string $client_secret, bool $no_cache = false ): WP_Error|string {
+function get_spotify_access_token(string $client_id, string $client_secret, bool $no_cache = false): WP_Error|string
+{
 	// Check for cached token first
-	$hashed_spotify_client_id = md5( $client_id );
-	$grant_type = 'client_credentials';
-	$cache_key = 'spotify_auth_token_' . $hashed_spotify_client_id . '_' . $grant_type;
-	
-	if ( ! $no_cache ) {
-		$cached_token = get_transient( $cache_key );
-		if ( false !== $cached_token ) {
+	$hashed_spotify_client_id = md5($client_id);
+	$grant_type               = 'client_credentials';
+	$cache_key                = 'spotify_auth_token_'.$hashed_spotify_client_id.'_'.$grant_type;
+
+	if ( ! $no_cache) {
+		$cached_token = get_transient($cache_key);
+		if (false !== $cached_token) {
 			return $cached_token;
 		}
 	}
-	
+
 	// Make request to Spotify API for token
 	$response = wp_remote_post(
 		'https://accounts.spotify.com/api/token',
@@ -36,33 +37,33 @@ function get_spotify_access_token( string $client_id, string $client_secret, boo
 			'headers' => [
 				'Content-Type' => 'application/x-www-form-urlencoded',
 			],
-			'body' => [
-				'grant_type' => 'client_credentials',
-				'client_id' => $client_id,
+			'body'    => [
+				'grant_type'    => 'client_credentials',
+				'client_id'     => $client_id,
 				'client_secret' => $client_secret,
 			],
 		]
 	);
 
-	if ( is_wp_error( $response ) ) {
+	if (is_wp_error($response)) {
 		return new WP_Error(
 			'spotify_auth_error',
-			__( 'Failed to retrieve access token', 'remote-data-blocks' )
+			__('Failed to retrieve access token', 'remote-data-blocks')
 		);
 	}
 
-	$response_body = wp_remote_retrieve_body( $response );
-	$response_data = json_decode( $response_body, true );
+	$response_body = wp_remote_retrieve_body($response);
+	$response_data = json_decode($response_body, true);
 
-	if ( ! isset( $response_data['access_token'] ) ) {
+	if ( ! isset($response_data['access_token'])) {
 		return new WP_Error(
 			'spotify_auth_error',
-			__( 'Invalid response from Spotify Auth', 'remote-data-blocks' )
+			__('Invalid response from Spotify Auth', 'remote-data-blocks')
 		);
 	}
 
 	$token = $response_data['access_token'];
-	
+
 	// Cache the token for 30 minutes
 	set_transient(
 		$cache_key,
@@ -73,42 +74,44 @@ function get_spotify_access_token( string $client_id, string $client_secret, boo
 	return $token;
 }
 
-function register_spotify_artists_tracks_block(): void {
-	$client_id = '81c45aad51d44ec6bda851e4aa6db611';
+function register_spotify_artists_tracks_block(): void
+{
+	$client_id     = '81c45aad51d44ec6bda851e4aa6db611';
 	$client_secret = '01f78fc45bc0486da9b3c7a506948aff';
-	$artist_id = '06HL4z0CvFAxyc27GXpf02';
+	$artist_id     = getenv('SPOTIFY_ARTIST_ID');
 
-	$spotify_data_source = HttpDataSource::from_array( [
-		'request_headers' => function () use ( $client_id, $client_secret ): array {
-			$token = get_spotify_access_token( $client_id, $client_secret );
-			if ( is_wp_error( $token ) ) {
+	$spotify_data_source = HttpDataSource::from_array([
+		'request_headers' => function () use ($client_id, $client_secret): array {
+			$token = get_spotify_access_token($client_id, $client_secret);
+			if (is_wp_error($token)) {
 				return [];
 			}
+
 			return [
-				'Authorization' => 'Bearer ' . $token,
+				'Authorization' => 'Bearer '.$token,
 			];
 		},
-		'endpoint' => 'https://api.spotify.com/v1',
-		'display_name' => 'Spotify',
-	] );
-	
+		'endpoint'        => 'https://api.spotify.com/v1',
+		'display_name'    => 'Spotify',
+	]);
+
 	// Define query to get artist's albums
-	$get_artist_albums_query = HttpQuery::from_array( [
-		'display_name' => 'Get Artist Top Tracks',
-		'data_source' => $spotify_data_source,
-		'endpoint' => function( array $input_variables ) use ( $artist_id, $spotify_data_source ): string {
-			return $spotify_data_source->get_endpoint() . '/artists/' . $artist_id . '/top-tracks?market=US';
+	$get_artist_albums_query = HttpQuery::from_array([
+		'display_name'  => 'Get Artist Top Tracks',
+		'data_source'   => $spotify_data_source,
+		'endpoint'      => function (array $input_variables) use ($artist_id, $spotify_data_source): string {
+			return $spotify_data_source->get_endpoint().'/artists/'.$artist_id.'/top-tracks?market=US';
 		},
 		'output_schema' => [
 			'is_collection' => true,
-			'path' => '$.tracks[*]',
-			'type' => [
-				'id' => [
+			'path'          => '$.tracks[*]',
+			'type'          => [
+				'id'          => [
 					'name' => 'Track ID',
 					'path' => '$.id',
 					'type' => 'id',
 				],
-				'name' => [
+				'name'        => [
 					'name' => 'Track Name',
 					'path' => '$.name',
 					'type' => 'string',
@@ -118,12 +121,12 @@ function register_spotify_artists_tracks_block(): void {
 					'path' => '$.duration_ms',
 					'type' => 'number',
 				],
-				'popularity' => [
+				'popularity'  => [
 					'name' => 'Popularity',
 					'path' => '$.popularity',
 					'type' => 'number',
 				],
-				'album_name' => [
+				'album_name'  => [
 					'name' => 'Album Name',
 					'path' => '$.album.name',
 					'type' => 'string',
@@ -135,16 +138,16 @@ function register_spotify_artists_tracks_block(): void {
 				],
 			],
 		],
-	] );
-	
+	]);
+
 	// Register the Remote Data Block
-	register_remote_data_block( [
-		'title' => 'Spotify Artist Top Tracks',
+	register_remote_data_block([
+		'title'        => 'Spotify Artist Top Tracks',
 		'render_query' => [
 			'query' => $get_artist_albums_query,
 		],
-	] );
+	]);
 }
 
 // Hook to initialize the block
-add_action( 'init', __NAMESPACE__ . '\\register_spotify_artists_tracks_block', 10, 0 );
+add_action('init', __NAMESPACE__.'\\register_spotify_artists_tracks_block', 10, 0);
