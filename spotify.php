@@ -78,7 +78,7 @@ function register_spotify_artists_tracks_block(): void
 {
 	$client_id     = '81c45aad51d44ec6bda851e4aa6db611';
 	$client_secret = '01f78fc45bc0486da9b3c7a506948aff';
-	$artist_id     = getenv('SPOTIFY_ARTIST_ID');
+	$artist_id     = defined('SPOTIFY_ARTIST_ID');
 
 	$spotify_data_source = HttpDataSource::from_array([
 		'request_headers' => function () use ($client_id, $client_secret): array {
